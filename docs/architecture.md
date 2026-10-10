@@ -1,0 +1,13 @@
+# Architecture and first-pass boundaries
+
+React/TypeScript/Vite phone-first web client -> same-origin Vite proxy -> Node/Express/Socket.IO -> Repository interface -> MemoryRepository. Shared Zod contracts live in packages/shared. Backend-only Photon and Gemini interfaces stay outside browser imports. No database or Tiger Data integration yet.
+
+The phone screen uses 48px touch targets, stacked controls and a low-decoration sensor panel. Dashboard becomes single-column below 700px. Expo is a possible next client: reuse contracts and backend, replace DeviceMotion capture with a native sensor adapter. This pass remains a web link with no app install; mobile hardware compatibility is unverified. Sensors work only while the page is active; this is not an always-on monitoring service.
+
+Memory resets on server restart. localStorage keeps device UUID, per-device packet sequence, display name, room and private session token. A device can reconnect to its existing room; changing room/resetting identity is not implemented. Browser tabs share identity and are not separate phones. No production authentication, moderation, durable inbox, persistence, or scale guarantees. The server rate-limits accepted sensor packets to 25Hz per socket; phone capture sends at most 10Hz. Traces retain 100 readings per device; members/rooms remain in memory until restart. Use test names only.
+
+Server receipt time is the first timing model. Device timestamps are retained and screened for age/order. Calibration, gravity removal, alignment, correlation, distinct-device sustained activity, cooldown and automatic events remain B's work. DetectionScaffold always returns null. Only manual developer events activate a board. Dashboard state contracts include Monitoring, Single-device motion, Correlated shaking, and Check-in active; the middle states await detection implementation.
+
+Messaging enrollment is currently mock-only and does not collect addresses. Shared snapshots contain no contact details. The mock outbox is developer-visible and may contain original text later, so scope/redact it before any public deployment. Spectrum uses a real SDK but is deliberately disconnected from application actions until D adds enrollment, mapping, durable idempotency, and validated handlers. GeminiScaffold always requests clarification.
+
+Safety invariants: no verified emergency/earthquake claims; explicit confirmation before a public request; no contacts from model output; member/event/request authorization in code; volunteer acknowledgment is not completion. Preserve original inbound text in private storage separately from interpreted intent. Room membership does not establish proximity.
