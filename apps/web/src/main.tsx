@@ -6,7 +6,19 @@ import {useMotion} from './features/sensor/useMotion';
 import {Panel} from './components/Panel';
 import './styles/theme.css';
 const socket:Socket<ServerToClientEvents,ClientToServerEvents>=io({autoConnect:false});
-function identity(){let id=localStorage.getItem('quakenet.device');if(!id){id=crypto.randomUUID();localStorage.setItem('quakenet.device',id);}return id;}
+// randomUUID is unavailable on some HTTP LAN origins; allow joining there while
+// motion capture still enforces HTTPS. getRandomValues retains random identity.
+function identity(){
+ let id=localStorage.getItem('quakenet.device');
+ if(!id){
+  const bytes=crypto.getRandomValues(new Uint8Array(16));
+  bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+  const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+  id=`${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  localStorage.setItem('quakenet.device',id);
+ }
+ return id;
+}
 const deviceId=identity();
 function App(){
  const [name,setName]=useState(localStorage.getItem('quakenet.name')||'');const [roomCode,setRoomCode]=useState(localStorage.getItem('quakenet.room')||'HINTON-4');
