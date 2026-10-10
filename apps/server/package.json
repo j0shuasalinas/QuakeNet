@@ -1,0 +1,22 @@
+{
+  "name": "@quakenet/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "@quakenet/shared": "*",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "spectrum-ts": "latest"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.7.0"
+  }
+}
